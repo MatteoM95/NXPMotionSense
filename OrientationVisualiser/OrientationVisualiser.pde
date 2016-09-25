@@ -36,8 +36,8 @@ void draw()
   float s1 = sin(radians(roll));
   float c2 = cos(radians(-pitch));
   float s2 = sin(radians(-pitch));
-  float c3 = cos(radians(yaw));
-  float s3 = sin(radians(yaw));
+  float c3 = cos(radians(-yaw));
+  float s3 = sin(radians(-yaw));
   applyMatrix( c2*c3, s1*s3+c1*c3*s2, c3*s1*s2-c1*s3, 0,
                -s2, c1*c2, c2*s1, 0,
                c2*s3, c1*s2*s3-c3*s1, c1*c3+s1*s2*s3, 0,
@@ -53,7 +53,7 @@ void draw()
   print("\t");
   print(-pitch);
   print("\t");
-  print(yaw);
+  print(360-yaw);
   println();
 }
 
