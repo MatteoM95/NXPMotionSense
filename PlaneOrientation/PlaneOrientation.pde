@@ -66,6 +66,7 @@ void serialEvent(Serial port) //Reading the datas by Processing.
         Theta = float(list[2]); // convert to float pitch
         Phi = float(list[3]); // convert to float roll
         altitude = float(list[4]); // convert to float alt (altitude)
+        altitude = round(altitude); //round off to nearest whole number
       }
     }
   } while (message != null); 

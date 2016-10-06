@@ -46,6 +46,7 @@ MPL3115A2::MPL3115A2()
 void MPL3115A2::begin(void)
 {
   Wire.begin();
+  Wire.setClock(400000);
 }
 
 
