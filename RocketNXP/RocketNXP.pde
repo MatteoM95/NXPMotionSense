@@ -1,4 +1,7 @@
 import processing.serial.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
 Serial myPort;
 
 float yaw = 0.0;
@@ -46,7 +49,7 @@ void draw()
   popMatrix(); // end of object
   //Print Values to the bottom of window
   text("ALTITUDE",-400,400);//heading
-  text(altitude,-400,420);
+  text(round(altitude),-400,420);
   text(" ROLL",-300,400);  //heading
   text(roll,-300,420);     //print variable  
   text(" PITCH",-200,400);
@@ -151,6 +154,8 @@ void serialEvent()
         pitch = float(list[2]); // convert to float pitch
         roll = float(list[3]); // convert to float roll
         altitude = float(list[4]); // convert to float alt (altitude)
+        // Write some text to the file
+        appendTextToFile(outFilename, list[0] + ", " + list[1] + ", " + list[2] + ", " + list[3] + ", " +list[4]); //print out to file just altitude
       }
     }
   } while (message != null);
@@ -235,3 +240,37 @@ void drawPropShield()   //not being used or displayed here
   translate(0,0,-20);
   box(6,4,8);
 }
+
+
+/**
+ * Appends text to the end of a text file located in the data directory, 
+ * creates the file if it does not exist.
+ * Can be used for big files with lots of rows, 
+ * existing lines will not be rewritten
+ */
+void appendTextToFile(String filename, String text){
+  File f = new File(dataPath(filename));
+  if(!f.exists()){
+    createFile(f);
+  }
+  try {
+    PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(f, true)));
+    out.println(text);
+    out.close();
+  }catch (IOException e){
+      e.printStackTrace();
+  }
+}
+
+/**
+ * Creates a new file including all subfolders
+ */
+void createFile(File f){
+  File parentDir = f.getParentFile();
+  try{
+    parentDir.mkdirs(); 
+    f.createNewFile();
+  }catch(Exception e){
+    e.printStackTrace();
+  }
+}   
