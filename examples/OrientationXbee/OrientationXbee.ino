@@ -18,13 +18,13 @@ NXPSensorFusion filter;
 KalmanFilter kf(0, 0.008, 10); //was (0, .01, 1.0) 
 
 void setup() {
-  Serial.begin(9600); // Not using the usb serial ... but kept this in
+  //Serial.begin(9600); // Not using the usb serial ... 
   //Begin HW serial
   Serial1.begin(230400); //set to highest baud rate for xbee pro module
   //XBees need to be programmed with the above baud setting. XBee Pro S1 max 115200
   //XBee pro SC2 max at 230400 baud. Need to make sure firmware in xbee is set to 802.15.4 TH PRO setting
   imu.begin();
-  filter.begin(100);
+  filter.begin(100); //this is for NXP Sensor Fusion filter
   
   myPressure.begin(); // Get mpl3115 sensor online
   //Configure the sensor
@@ -49,7 +49,7 @@ void loop() {
     // Update the SensorFusion filter
     filter.update(gx, gy, gz, ax, ay, az, mx, my, mz);
 
-    int alt = (int) myPressure.readAltitudeFt(); // gets rid of decimals in reading for faster transmition 
+    float alt = (float) myPressure.readAltitudeFt(); // gets float of altitude with two decimal places for kalman filtering
     float alt_kalman = kf.step(alt); //filter noise from altimeter sensor, and get readings to settle
 
     // print the heading, pitch and roll to the xbee serial port
