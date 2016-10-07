@@ -2,6 +2,7 @@ import processing.serial.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
+String outFilename = "data.csv";
 Serial myPort;
 
 float yaw = 0.0;
