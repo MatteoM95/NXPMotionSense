@@ -1,14 +1,26 @@
+//  This software is based on Paul Stoffregen's work 
+//  It was adapted to display a 3D rocket with position, altitude and GPS information
+//  And to work through serial radio modems from Digi
+//  Location of software: https://github.com/radiohound/NXPMotionSense
+//  More info about project: https://hackaday.io/project/15425-rocket-real-time-transponder-and-gui
+
 import processing.serial.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
-String outFilename = "data.csv";
-Serial myPort;
+//  Define file for storing received information. This is a time and date stamped filename.
+String outFilename = month()+ "-" + day() + "-" + year() + "_" + hour() + "_" + minute() + "-" + "data.csv";
+Serial myPort;  //only one serial port in use here. This is connected to an XBee Pro device
 
 float yaw = 0.0;
 float pitch = 0.0;
 float roll = 0.0;
 float altitude = 0.0;
+float fLon = 0.0;
+float fLat =0.0;
+long lon = 0;
+long lat = 0;
+
 
 void setup()
 {
@@ -18,7 +30,7 @@ void setup()
   //XBees need to be programmed with the above baud setting. XBee Pro S1 max 115200
   //XBee pro SC2 max at 230400 baud. Need to make sure firmware in xbee is set to 802.15.4 TH PRO setting
   // if you know the serial port name
-  //myPort = new Serial(this, "COM6:", 9600);        // Windows "COM#:"
+  //myPort = new Serial(this, "COM6:", 230400);        // Windows "COM#:"
   //myPort = new Serial(this, "\\\\.\\COM41", 9600); // Windows, COM10 or higher
   //myPort = new Serial(this, "/dev/ttyACM0", 9600);   // Linux "/dev/ttyACM#"
   //myPort = new Serial(this, "/dev/cu.usbmodem1217321", 9600);  // Mac "/dev/cu.usbmodem######"
@@ -46,9 +58,9 @@ void draw()
 
   //drawPropShield();  //we are going to draw a rocket instead
 
-  draw2();
+  drawRocket();
   popMatrix(); // end of object
-  //Print Values to the bottom of window
+  //Print variable values to the bottom of window
   text("ALTITUDE",-400,400);//heading
   text(round(altitude),-400,420);
   text(" ROLL",-300,400);  //heading
@@ -57,6 +69,10 @@ void draw()
   text(pitch,-200,420);
   text(" YAW",-100,400);
   text(360-yaw,-100,420);
+  text(" LAT",0,400);
+  text(nf(fLat,2,5),0,420);
+  text(" LON",100,400);
+  text(nf(fLon,3,5),100,420);
   
   // Print values to console
   print(roll);
@@ -68,7 +84,7 @@ void draw()
 }
 
 
-void draw2()
+void drawRocket()
 {
     background(0, 128, 255);
     lights();
@@ -94,7 +110,7 @@ beginShape();
   vertex(   0,    0,  100);
 endShape();
 
-//start rocket fin set
+//start another rocket fin set
   fill(0);
   translate( 0, 0, -150 );
   beginShape();
@@ -128,7 +144,7 @@ void drawCylinder( int sides, float r1, float r2, float h)
     }
     endShape(CLOSE);
     
-    // draw sides
+    // fill sides
     beginShape(TRIANGLE_STRIP);
     stroke(180,0,0);
     for (int i = 0; i < sides + 1; i++) {
@@ -155,8 +171,10 @@ void serialEvent()
         pitch = float(list[2]); // convert to float pitch
         roll = float(list[3]); // convert to float roll
         altitude = float(list[4]); // convert to float alt (altitude)
-        // Write some text to the file
-        appendTextToFile(outFilename, list[0] + ", " + list[1] + ", " + list[2] + ", " + list[3] + ", " +list[4]); //print out to file just altitude
+        fLat = float(list[5])/1000000; //lattitude is received without a decimal point, although the math done by the arduino converts it to decimal form
+        fLon = float(list[6])/1000000; // This divide function gets our decimal point back
+        // Write received values to the text file
+        appendTextToFile(outFilename, millis() + ", " + list[0] + ", " + list[1] + ", " + list[2] + ", " + list[3] + ", " +list[4] + ", " + list[5] + ", " +list[6] + ", " + second()); //print out to file just altitude
       }
     }
   } while (message != null);
@@ -164,7 +182,7 @@ void serialEvent()
 
 
 
-void drawPropShield()   //not being used or displayed here
+void drawPropShield()   // function not being used or displayed here
 {
   // 3D art by Benjamin Rheinland
   stroke(0); // black outline
