@@ -90,10 +90,14 @@ void draw()  {
   }
 
   stroke(75); // grey lines here
-  j = (maximum/heightAxisAdjustment)-1;
-  for (int i = 0; i < ((maximum)/heightAxisAdjustment); i++) {  // sample markers. 
-    float x = map(i, 0, ((maximum)/heightAxisAdjustment)-1, topMargin, height-bottomMargin); 
-    line(leftMargin, x, width-rightMargin, x); 
+  for (int i = 0; i < ((maximum-minimum)/(heightAxisAdjustment)+1); i++) {  // sample markers. 
+  //for (int i = 0; i < 30; i++) {  // sample markers. 
+    float y = map(i, 0, ((maximum-minimum)/heightAxisAdjustment), height-bottomMargin, topMargin); 
+    //float x = map(i, 0, ((maximum)/heightAxisAdjustment)-1, topMargin, height-bottomMargin); 
+    text(i*heightAxisAdjustment,leftMargin - leftMargin/3,y); // draw text on axis for altitude values
+    line(leftMargin, y, width-rightMargin, y); 
+    println(maximum, minimum, heightAxisAdjustment);
+    
   } 
     noFill();
     stroke(255, 0, 0);
@@ -103,11 +107,7 @@ void draw()  {
       float y = map(altitude[i], minimum, maximum, height-bottomMargin, topMargin);
       vertex(x, y); 
     }
-    // This draws text altitude markers for each of the altitude marking lines
-    for (int i = 0; i < j+1; i++) {
-      float z = map(i, 0, j, height-bottomMargin, topMargin);
-      text(i*heightAxisAdjustment,leftMargin - leftMargin/3, z);
-    }
+
     endShape();
     // Print static axis labels
     textSize(22);
